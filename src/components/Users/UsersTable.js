@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { FaTrash, FaUserEdit } from "react-icons/fa";
 import classes from "./UsersTable.module.css";
-import { getUsers } from "../../services/usersService";
+import { getUsers, removeUser } from "../../services/usersService";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
@@ -41,19 +41,8 @@ const UsersTable = () => {
   }, []);
 
   const removeUserHandler = async (userId) => {
-    console.log(userId);
-
-    const response = await fetch(
-      `https://react-http-fb62d-default-rtdb.firebaseio.com/users/${userId}.json`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await response.json();
-    console.log(data);
+    const response = await removeUser(userId);
+    await response.json();
     fetchUsersHandler();
   };
 

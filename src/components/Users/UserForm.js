@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { createUser, updateUser } from "../../services/usersService";
 import classes from "./UserForm.module.css";
 
 const UserForm = (props) => {
@@ -24,31 +25,13 @@ const UserForm = (props) => {
 
   async function updateUserHandler(user) {
     const id = props?.id;
-    const response = await fetch(
-      `https://react-http-fb62d-default-rtdb.firebaseio.com/users/${id}.json`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(user),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await updateUser(id, user);
     await response.json();
     cleanInputs();
   }
 
   async function addUserHandler(user) {
-    const response = await fetch(
-      "https://react-http-fb62d-default-rtdb.firebaseio.com/users.json",
-      {
-        method: "POST",
-        body: JSON.stringify(user),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await createUser(user);
 
     await response.json();
     cleanInputs();
