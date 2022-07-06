@@ -2,18 +2,19 @@ import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { FaTrash, FaUserEdit } from "react-icons/fa";
 import classes from "./UsersTable.module.css";
+import { getUsers } from "../../services/usersService";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const history = useHistory();
 
   const fetchUsersHandler = useCallback(async () => {
-    /* setIsLoading(true);
-    setError(null); */
+    setIsLoading(true);
+    setError(null);
     try {
-      const response = await fetch(
-        "https://react-http-fb62d-default-rtdb.firebaseio.com/users.json"
-      );
+      const response = await getUsers();
       if (!response.ok) {
         throw new Error("Something went wrong!");
       }
@@ -33,10 +34,10 @@ const UsersTable = () => {
 
       setUsers(loadedUsers);
     } catch (error) {
-      /* setError(error.message); */
+      setError(error.message);
       console.log(error);
     }
-    /* setIsLoading(false); */
+    setIsLoading(false);
   }, []);
 
   const removeUserHandler = async (userId) => {
@@ -57,7 +58,6 @@ const UsersTable = () => {
   };
 
   const editUserHandler = (user) => {
-    /* console.log(user); */
     history.push("/editUser", { params: user });
   };
 
@@ -67,43 +67,50 @@ const UsersTable = () => {
 
   return (
     <section className={classes.container}>
-      <table>
-        <thead>
-          <tr>
-            <th>id</th>
-            <th>Name</th>
-            <th>Role</th>
-            <th>Edit</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users &&
-            users.length > 0 &&
-            users.map((user) => {
-              return (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.name}</td>
-                  <td>{user.role}</td>
-                  <td className={classes.edit}>
-                    <button type="button" onClick={() => editUserHandler(user)}>
-                      <FaUserEdit />
-                    </button>
-                  </td>
-                  <td className={classes.delete}>
-                    <button
-                      type="button"
-                      onClick={() => removeUserHandler(user.id)}
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-        </tbody>
-      </table>
+      {isLoading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+      {users.length > 0 && (
+        <table>
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Edit</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users &&
+              users.length > 0 &&
+              users.map((user) => {
+                return (
+                  <tr key={user.id}>
+                    <td>{user.id}</td>
+                    <td>{user.name}</td>
+                    <td>{user.role}</td>
+                    <td className={classes.edit}>
+                      <button
+                        type="button"
+                        onClick={() => editUserHandler(user)}
+                      >
+                        <FaUserEdit />
+                      </button>
+                    </td>
+                    <td className={classes.delete}>
+                      <button
+                        type="button"
+                        onClick={() => removeUserHandler(user.id)}
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+          </tbody>
+        </table>
+      )}
     </section>
   );
 };
