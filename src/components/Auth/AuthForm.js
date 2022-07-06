@@ -1,5 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { signInWithPassword, signUp } from "../../services/authService";
 import AuthContext from "../../store/auth-context";
 
 import classes from "./AuthForm.module.css";
@@ -19,29 +20,21 @@ const AuthForm = () => {
   };
 
   const submitHandler = (event) => {
+    let response;
     event.preventDefault();
 
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
 
     setIsLoading(true);
-    let url = "";
+
     if (isLogin) {
-      url = `${process.env.REACT_APP_FIREBASE_URL}/accounts:signInWithPassword?key=${process.env.REACT_APP_FIREBASE_API_KEY}`;
+      response = signInWithPassword(enteredEmail, enteredPassword);
     } else {
-      url = `${process.env.REACT_APP_FIREBASE_URL}/accounts:signUp?key=${process.env.REACT_APP_FIREBASE_API_KEY}`;
+      response = signUp(enteredEmail, enteredPassword);
     }
-    fetch(url, {
-      method: "POST",
-      body: JSON.stringify({
-        email: enteredEmail,
-        password: enteredPassword,
-        returnSecureToken: true,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+
+    response
       .then((res) => {
         setIsLoading(false);
         if (res.ok) {
