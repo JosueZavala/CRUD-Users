@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { createLog } from "../../services/logService";
 import { createUser, updateUser } from "../../services/usersService";
 import classes from "./UserForm.module.css";
 
@@ -26,14 +27,18 @@ const UserForm = (props) => {
   async function updateUserHandler(user) {
     const id = props?.id;
     const response = await updateUser(id, user);
-    await response.json();
+    if (response.ok) {
+      await createLog("USER UPDATED");
+    }
     cleanInputs();
   }
 
   async function addUserHandler(user) {
     const response = await createUser(user);
 
-    await response.json();
+    if (response.ok) {
+      await createLog("USER ADDED");
+    }
     cleanInputs();
   }
 

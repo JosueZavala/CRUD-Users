@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import { FaTrash, FaUserEdit } from "react-icons/fa";
 import classes from "./UsersTable.module.css";
 import { getUsers, removeUser } from "../../services/usersService";
+import { createLog } from "../../services/logService";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
@@ -18,11 +19,13 @@ const UsersTable = () => {
       if (!response.ok) {
         throw new Error("Something went wrong!");
       }
+      if (response.ok) {
+        await createLog("USERS READED");
+      }
 
       const data = await response.json();
 
       const loadedUsers = [];
-      console.log(data);
 
       for (const key in data) {
         loadedUsers.push({
@@ -42,7 +45,9 @@ const UsersTable = () => {
 
   const removeUserHandler = async (userId) => {
     const response = await removeUser(userId);
-    await response.json();
+    if (response.ok) {
+      await createLog("USER REMOVED");
+    }
     fetchUsersHandler();
   };
 
